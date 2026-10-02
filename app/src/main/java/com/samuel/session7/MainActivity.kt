@@ -4,15 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samuel.session7.ui.theme.Session7Theme
@@ -126,6 +136,81 @@ fun ProfileContent(
             .padding(16.dp)
     ) {
         UserProfileCard(user)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = newUsername,
+            onValueChange = onUsernameChange,
+            label = { Text("Edit username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        //Challenge 6
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = newAge,
+            onValueChange = onAgeChange,
+            label = { Text("Edit Age") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = onUpdateProfile,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Update Profile")
+        }
+
+        //Challenge 7
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = newFriendName,
+            onValueChange = onFriendNameChange,
+            label = {Text("Enter friend's name")},
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        //Challenge 8
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = onAddFriend,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Add Friend")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        FriendList(
+            friends = friends,
+            onRemoveFriend = onRemoveFriend
+        )
+
+        //Challenge 9
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Challenge 10
+            Button(
+                onClick = onLike,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Like")
+            }
+        }
     }
 }
 
@@ -153,5 +238,54 @@ fun UserProfileCard(user: User){
             Text(text = "Age Group: ${user.getAgeGroup(user.age)}")
         }
 
+    }
+}
+
+@Composable
+fun FriendItem(friendName: String, onRemoveFriend: () -> Unit){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = friendName,
+                modifier = Modifier.weight(1f)
+            )
+
+            Button(onClick = onRemoveFriend) {
+                Text("Remove")
+            }
+        }
+    }
+}
+
+@Composable
+fun FriendList(friends: List<String>, onRemoveFriend: (String) -> Unit){
+    Text(
+        text = "Friends (${friends.size})",
+        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+    )
+    if (friends.isEmpty()){
+        Text("No friends added yet.")
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+        ) {
+            items(friends){friend ->
+                FriendItem(
+                    friendName = friend,
+                    onRemoveFriend = {onRemoveFriend(friend)}
+                )
+            }
+        }
     }
 }
